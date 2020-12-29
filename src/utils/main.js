@@ -6,6 +6,13 @@ function CenterContent({ children }) {
       <div className="m-auto">{children}</div>
     </div>
   );
-};
+}
 
-export { CenterContent }
+function getSuccessorQueryToSearch(query) {
+  const result = query.replace(/.$/, (c) =>
+    String.fromCharCode(c.charCodeAt(0) + 1)
+  );
+  return result;
+}
+
+export { CenterContent, getSuccessorQueryToSearch };

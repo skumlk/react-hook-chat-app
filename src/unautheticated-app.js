@@ -1,11 +1,11 @@
 /** @jsx jsx */
-import { css, jsx } from "@emotion/react";
-
+import { jsx } from "@emotion/react";
 import React from "react";
-import PropTypes from "prop-types";
 import * as colors from "./styles/colors";
 import { Route, Link, Switch } from "react-router-dom";
 import { CenterContent } from "utils/main";
+import { useFirebaseAuth } from "context/firebase/auth-context";
+import { Input, Button } from "@chakra-ui/react";
 
 function Login() {
   return (
@@ -19,17 +19,29 @@ function Login() {
         }}
       >
         <label htmlFor="username">Username</label>
-        <input id="username" type="text" />
+        <Input id="username" type="text" />
         <label htmlFor="password">Password</label>
-        <input id="password" type="text" />
-        <input type="submit" className="col-span-2" value="Login" />
-        <Link to="/register">Register</Link>
+        <Input id="password" type="text" />
+        <Button type="submit" className="col-span-2">Login</Button>
+        <Button><Link to="/register">Register</Link></Button>
       </form>
     </CenterContent>
   );
 }
 
 function Register() {
+  const { register } = useFirebaseAuth();
+
+  function onRegister(e) {
+    e.preventDefault();
+    const { email, name, password } = e.target;
+    register(name.value, email.value, password.value)
+      .then((user) => {
+        console.log(user);
+      })
+      .catch((error) => console.log(error));
+  }
+
   return (
     <CenterContent>
       <form
@@ -39,13 +51,16 @@ function Register() {
           backgroundColor: colors.green,
           gridTemplateColumns: "min-content auto",
         }}
+        onSubmit={onRegister}
       >
-        <label htmlFor="username">Username</label>
-        <input id="username" type="text" />
+        <label htmlFor="name">Full Name</label>
+        <Input id="name" type="text" />
+        <label htmlFor="email">Email</label>
+        <Input id="email" type="text" />
         <label htmlFor="password">Password</label>
-        <input id="password" type="text" />
-        <input type="submit" className="col-span-2" value="Register" />
-        <Link to="/login">Login</Link>
+        <Input id="password" type="password" />
+        <Button type="submit" className="col-span-2">Register</Button>
+        <Button><Link to="/login">Login</Link></Button>
       </form>
     </CenterContent>
   );
