@@ -8,7 +8,7 @@ function App() {
   const { user } = useFirebaseAuth();
 
   return (
-    <div className="App">
+    <div className="App flex flex-col">
       <Header />
       {user ? <AuthenticatedApp /> : <UnauthenticatedApp />}
     </div>

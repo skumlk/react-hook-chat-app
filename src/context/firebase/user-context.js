@@ -29,7 +29,8 @@ function useUserApi() {
   };
 
   const fetchUsersByIds = async (id_list) => {
-    console.log("Fetching all users");
+    if (!id_list || id_list.length == 0) return Promise.resolve();
+
     const users = await db
       .collection("users")
       .where(firebase.firestore.FieldPath.documentId(), "in", id_list)
@@ -45,7 +46,7 @@ function useUserApi() {
   const getUserById = async (id) => {
     console.log("fetching user: ", id);
     const user = await db.collection("users").doc(id).get();
-    return user.data()
+    return user.data();
   };
 
   return { getUsersByName, fetchUsersByIds, getUserById };

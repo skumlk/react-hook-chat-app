@@ -1,96 +1,16 @@
 import React, { useEffect, useState } from "react";
-import {
-  Button,
-  Input,
-  ListItem,
-  OrderedList,
-  Textarea,
-} from "@chakra-ui/react";
-import { useUser } from "context/firebase/user-context";
+import { Button, Textarea } from "@chakra-ui/react";
 import { useChat } from "context/firebase/chat-context";
-import { useQuery } from "react-query";
+import User from "components/User";
+import UserSearch from "components/UserSearch";
+import UserProfile from "screens/UserProfile";
+import { Switch, Route } from "react-router-dom";
+import TimeAgo from "timeago-react";
+import { useFirebaseAuth } from "context/firebase/auth-context";
 
-function UserSearch({ onUserChange }) {
-  const [query, setQuery] = useState("");
-  const [users, setUsers] = useState([]);
-  const { getUsersByName } = useUser();
-
-  function onUserClick(id) {
-    setQuery("");
-    onUserChange(id);
-  }
-
-  useEffect(() => {
-    if (!query) {
-      setUsers([]);
-      return;
-    }
-    getUsersByName(query).then((result) => {
-      const users = [];
-      if (!result.empty)
-        result.forEach((doc) => users.push({ id: doc.id, ...doc.data() }));
-      setUsers(users);
-    });
-  }, [query, getUsersByName]);
-
-  return (
-    <div>
-      <Input
-        placeholder="Search By Name"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-      />
-      <OrderedList>
-        {users.length === 0 && query && (
-          <ListItem>No users for {query}</ListItem>
-        )}
-        {users &&
-          users.map((item) => (
-            <ListItem key={item.id} onClick={() => onUserClick(item.id)}>
-              {item.name}
-            </ListItem>
-          ))}
-      </OrderedList>
-    </div>
-  );
-}
-
-function User({ user_id }) {
-  const { getUserById } = useUser();
-  const { status, data: user, isLoading, error } = useQuery(
-    ["user", user_id],
-    () => getUserById(user_id),
-    {
-      refetchOnWindowFocus: false,
-      refetchOnMount: false
-    }
-  );
-  return <div>{!isLoading && user.name}:&nbsp;</div>;
-}
-
-function ChatHistory(){
-
-}
-
-function ChatMessages(){
-  
-}
-
-
-
-function AuthenticatedApp() {
-  const [user, setUser] = useState();
-  const {
-    sendMessage,
-    subscribeChat,
-    unsubscribeChat,
-    subscribeToChatHisory,
-    getChatHistory,
-  } = useChat();
-  const { getUserById } = useUser();
-  const [message, setMessage] = useState();
-  const [chatMessages, setChatMessages] = useState([]);
+function ChatHistory({ setUser }) {
   const [chatList, setChatList] = useState([]);
+  const { subscribeToChatHisory, getChatHistory } = useChat();
 
   useEffect(() => {
     getChatHistory().then(() => {
@@ -102,7 +22,6 @@ function AuthenticatedApp() {
 
         if (change.type === "modified") {
           const newDoc = change.doc.data();
-          console.log("modified chat history", newDoc);
           setChatList((chatList) => {
             const list = chatList.filter((x) => x.user !== newDoc.user);
             list.unshift(newDoc);
@@ -114,6 +33,48 @@ function AuthenticatedApp() {
 
     // return () => unsubscribe();
   }, []);
+
+  return (
+    <React.Fragment>
+      <div className="p-4">
+        {chatList.length === 0 && <div className="mt-2">No chats</div>}
+        <ul>
+          {chatList.map((chat) => (
+            <li onClick={() => setUser(chat.user)}>
+              <User user_id={chat.user} /> {chat.message},{" "}
+              {chat.updated ? (
+                <TimeAgo datetime={new Date(chat.updated.seconds * 1000)} />
+              ) : (
+                "Just Now"
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </React.Fragment>
+  );
+}
+
+function ChatMessage({ message, isReply }) {
+  console.log(isReply);
+  return (
+    <div className={isReply ? "text-right" : "text-left"}>
+      {message.message}
+      {isReply && <User user_id={message.user} />}
+      {message.created ? (
+        <TimeAgo datetime={new Date(message.created.seconds * 1000)} />
+      ) : (
+        "Just Now"
+      )}
+      {!isReply && <User user_id={message.user} />}
+    </div>
+  );
+}
+
+function ChatMessages({ user }) {
+  const { subscribeChat, unsubscribeChat } = useChat();
+  const [chatMessages, setChatMessages] = useState([]);
+  const { user: authUser } = useFirebaseAuth();
 
   useEffect(() => {
     console.log("Subscribing");
@@ -141,11 +102,32 @@ function AuthenticatedApp() {
     };
   }, [user]);
 
+  return (
+    <React.Fragment>
+      {chatMessages.length === 0 && (
+        <div className="text-2xl my-auto h-full ">
+          <h3>Select a chat to start a conversation</h3>
+        </div>
+      )}
+      {chatMessages.map((message) => (
+        <ChatMessage
+          key={message.key}
+          message={message}
+          isReply={authUser.uid === message.user}
+        />
+      ))}
+    </React.Fragment>
+  );
+}
+
+function ChatInput({ onNewMessage, disabled }) {
+  const [message, setMessage] = useState();
+
   function onKeyDown(e) {
     if (e.key === "Enter") {
       e.preventDefault();
-      sendMessage(user, message);
       setMessage("");
+      onNewMessage(message);
     }
   }
 
@@ -154,50 +136,61 @@ function AuthenticatedApp() {
   }
 
   return (
+    <div className="bg-white">
+      <Textarea
+        placeholder="Enter message to send"
+        value={message}
+        onKeyDown={onKeyDown}
+        onChange={onMessageChange}
+        disabled={disabled}
+        border="0px"
+        borderRadius="0"
+      />
+    </div>
+  );
+}
+
+function ChatHome() {
+  const [user, setUser] = useState();
+  const { sendMessage } = useChat();
+
+  function sendNewMessage(message) {
+    sendMessage(user, message);
+  }
+
+  return (
     <React.Fragment>
-      <Button>Start Chat</Button>
-      <div className="flex flex-row min-h-full min-w-full">
-        <div className="max-w-7xl p-3 border-r-2 min-h-full bg-gray-100	">
+      <div className="flex flex-row flex-grow bg-gray-200 p-4 max-h-full">
+        <div className="w-80 p-3 border-r-2 bg-white mr-2">
           <UserSearch onUserChange={setUser} />
-          {chatList.length === 0 && <div className="mt-2">No chats</div>}
-          <ul>
-            {chatList.map((chat) => (
-              <li onClick={() => setUser(chat.user)}>
-                <User user_id={chat.user} /> {chat.message},{" "}
-                {chat.updated
-                  ? new Date(chat.updated.seconds).toISOString()
-                  : "Just Now"}
-              </li>
-            ))}
-          </ul>
+          <div className="flex border-b-2 pb-2 items-center p-4">
+            <div className="flex-grow">Chat</div>
+            <Button>New</Button>
+          </div>
+          <ChatHistory setUser={setUser} />
         </div>
-        <div className="p-3 bg-gray-50 flex-grow">
-          <div>
-            {chatMessages.length === 0 && (
-              <div className="text-2xl my-auto min-h-full">
-                Select a chat to start a conversation
-              </div>
-            )}
-            {chatMessages.map((x) => (
-              <div key={x.key}>
-                {x.message} <User user_id={x.user} />
-                {x.created
-                  ? new Date(x.created.seconds).toISOString()
-                  : "Just Now"}
-              </div>
-            ))}
+        <div className="p-3 bg-gray-100 flex-grow flex flex-col ">
+          <div className="flex-grow overflow-y-scroll p-5">
+            <ChatMessages user={user} />
           </div>
-          <div>
-            <Textarea
-              placeholder="Enter message to send"
-              value={message}
-              onKeyDown={onKeyDown}
-              onChange={onMessageChange}
-              disabled={!user}
-            />
-          </div>
+          <ChatInput onNewMessage={sendNewMessage} disabled={!user} />
         </div>
       </div>
+    </React.Fragment>
+  );
+}
+
+function AuthenticatedApp() {
+  return (
+    <React.Fragment>
+      <Switch>
+        <Route path="/user">
+          <UserProfile />
+        </Route>
+        <Route path="/">
+          <ChatHome />
+        </Route>
+      </Switch>
     </React.Fragment>
   );
 }

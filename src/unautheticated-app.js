@@ -8,6 +8,18 @@ import { useFirebaseAuth } from "context/firebase/auth-context";
 import { Input, Button } from "@chakra-ui/react";
 
 function Login() {
+  const { login } = useFirebaseAuth();
+
+  function onLogin(e) {
+    e.preventDefault();
+    const { email, password } = e.target;
+    login(email.value, password.value)
+      .then((user) => {
+        console.log(user);
+      })
+      .catch((error) => console.log(error));
+  }
+
   return (
     <CenterContent>
       <form
@@ -17,13 +29,18 @@ function Login() {
           backgroundColor: colors.green,
           gridTemplateColumns: "min-content auto",
         }}
+        onSubmit={onLogin}
       >
-        <label htmlFor="username">Username</label>
-        <Input id="username" type="text" />
+        <label htmlFor="email">Email</label>
+        <Input id="email" type="text" />
         <label htmlFor="password">Password</label>
         <Input id="password" type="text" />
-        <Button type="submit" className="col-span-2">Login</Button>
-        <Button><Link to="/register">Register</Link></Button>
+        <Button type="submit" className="col-span-2">
+          Login
+        </Button>
+        <Button>
+          <Link to="/register">Register</Link>
+        </Button>
       </form>
     </CenterContent>
   );
@@ -59,8 +76,12 @@ function Register() {
         <Input id="email" type="text" />
         <label htmlFor="password">Password</label>
         <Input id="password" type="password" />
-        <Button type="submit" className="col-span-2">Register</Button>
-        <Button><Link to="/login">Login</Link></Button>
+        <Button type="submit" className="col-span-2">
+          Register
+        </Button>
+        <Button>
+          <Link to="/login">Login</Link>
+        </Button>
       </form>
     </CenterContent>
   );

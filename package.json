@@ -20,7 +20,8 @@
     "react-query": "^3.5.5",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.3",
-    "tailwindcss": "^2.0.1"
+    "tailwindcss": "^2.0.1",
+    "timeago-react": "^3.0.1"
   },
   "scripts": {
     "build:tailwind": "tailwindcss build src/styles/tailwind.css -o src/styles/tailwind.output.css",
