@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { useFirebaseAuth } from "./auth-context";
+import { useUser } from "./user-context";
 import { useFirebase } from "./firebase-context";
 import firebase from "firebase";
 const { createContext } = require("react");
@@ -14,24 +15,33 @@ function useChat() {
 
 function ChatProvider({ children }) {
   const { user } = useFirebaseAuth();
+  const { fetchUsersByIds } = useUser();
   const { firestore: db, admin } = useFirebase();
-  const chatapi = getChatApi(user, db, admin);
+  const chatapi = getChatApi(user, db, admin, fetchUsersByIds);
   return (
     <ChatContext.Provider value={chatapi}>{children}</ChatContext.Provider>
   );
 }
 
-function getChatApi(user, db) {
+function getChatApi(user, db, admin, fetchUsersByIds) {
   function addToChatHistory(user1, user2, message) {
     const batch = db.batch();
     batch.set(
       db.collection("chat_history").doc(user1).collection("chats").doc(user2),
-      { updated: firebase.firestore.FieldValue.serverTimestamp(), message, user: user2 },
+      {
+        updated: firebase.firestore.FieldValue.serverTimestamp(),
+        message,
+        user: user2,
+      },
       { merge: true }
     );
     batch.set(
       db.collection("chat_history").doc(user2).collection("chats").doc(user1),
-      { updated: firebase.firestore.FieldValue.serverTimestamp(), message, user: user1 },
+      {
+        updated: firebase.firestore.FieldValue.serverTimestamp(),
+        message,
+        user: user1,
+      },
       { merge: true }
     );
 
@@ -58,9 +68,25 @@ function getChatApi(user, db) {
       .collection("chat_history")
       .doc(user.uid)
       .collection("chats")
+      .orderBy("updated")
       .onSnapshot((querySnapshot) => {
         querySnapshot.docChanges().forEach(callback);
       });
+  };
+
+  const getChatHistory = async () => {
+    const user_list = new Set();
+    const chat_history = await db
+      .collection("chat_history")
+      .doc(user.uid)
+      .collection("chats")
+      .get();
+    chat_history.forEach((doc) => {
+      user_list.add(doc.data().user);
+    });
+
+    fetchUsersByIds([...user_list]);
+    console.log(user_list);
   };
 
   const unsubscribeChat = (unsub) => {
@@ -90,6 +116,7 @@ function getChatApi(user, db) {
     unsubscribeChat,
     sendMessage,
     subscribeToChatHisory,
+    getChatHistory,
   };
 }
 

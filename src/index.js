@@ -9,19 +9,24 @@ import { BrowserRouter } from "react-router-dom";
 import { ChakraProvider } from "@chakra-ui/react";
 import { UserProvider } from "context/firebase/user-context";
 import { ChatProvider } from "context/firebase/chat-context";
+import { QueryClient, QueryClientProvider } from "react-query";
+
+const queryClient = new QueryClient();
 
 ReactDOM.render(
   <React.StrictMode>
     <ChakraProvider>
       <FirebaseProvider>
         <FirebaseAuthProvider>
-          <UserProvider>
-            <ChatProvider>
-              <BrowserRouter>
-                <App />
-              </BrowserRouter>
-            </ChatProvider>
-          </UserProvider>
+          <QueryClientProvider client={queryClient}>
+            <UserProvider>
+              <ChatProvider>
+                <BrowserRouter>
+                  <App />
+                </BrowserRouter>
+              </ChatProvider>
+            </UserProvider>
+          </QueryClientProvider>
         </FirebaseAuthProvider>
       </FirebaseProvider>
     </ChakraProvider>

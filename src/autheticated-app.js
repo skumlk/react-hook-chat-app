@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Input,
@@ -8,6 +8,7 @@ import {
 } from "@chakra-ui/react";
 import { useUser } from "context/firebase/user-context";
 import { useChat } from "context/firebase/chat-context";
+import { useQuery } from "react-query";
 
 function UserSearch({ onUserChange }) {
   const [query, setQuery] = useState("");
@@ -30,7 +31,7 @@ function UserSearch({ onUserChange }) {
         result.forEach((doc) => users.push({ id: doc.id, ...doc.data() }));
       setUsers(users);
     });
-  }, [query]);
+  }, [query, getUsersByName]);
 
   return (
     <div>
@@ -54,6 +55,29 @@ function UserSearch({ onUserChange }) {
   );
 }
 
+function User({ user_id }) {
+  const { getUserById } = useUser();
+  const { status, data: user, isLoading, error } = useQuery(
+    ["user", user_id],
+    () => getUserById(user_id),
+    {
+      refetchOnWindowFocus: false,
+      refetchOnMount: false
+    }
+  );
+  return <div>{!isLoading && user.name}:&nbsp;</div>;
+}
+
+function ChatHistory(){
+
+}
+
+function ChatMessages(){
+  
+}
+
+
+
 function AuthenticatedApp() {
   const [user, setUser] = useState();
   const {
@@ -61,48 +85,60 @@ function AuthenticatedApp() {
     subscribeChat,
     unsubscribeChat,
     subscribeToChatHisory,
-    getAllChats,
+    getChatHistory,
   } = useChat();
+  const { getUserById } = useUser();
   const [message, setMessage] = useState();
   const [chatMessages, setChatMessages] = useState([]);
   const [chatList, setChatList] = useState([]);
 
   useEffect(() => {
-    const unsubscribe = subscribeToChatHisory(function (change) {
-      if (change.type === "added") {
-        const newDoc = change.doc.data();
-        setChatList((data) => [...data, newDoc]);
-        console.log(newDoc);
-      }
+    getChatHistory().then(() => {
+      const unsubscribe = subscribeToChatHisory(function (change) {
+        if (change.type === "added") {
+          const newDoc = change.doc.data();
+          setChatList((data) => [...data, newDoc]);
+        }
 
-      if (change.type === "modified") {
-        const newDoc = change.doc.data();
-        console.log("modified chat history", newDoc);
-        setChatList((chatList) => {
-          const list = chatList.filter(x => x.user !== newDoc.user)
-          list.unshift(newDoc)
-          return list
-        });
-      }
+        if (change.type === "modified") {
+          const newDoc = change.doc.data();
+          console.log("modified chat history", newDoc);
+          setChatList((chatList) => {
+            const list = chatList.filter((x) => x.user !== newDoc.user);
+            list.unshift(newDoc);
+            return list;
+          });
+        }
+      });
     });
 
     // return () => unsubscribe();
   }, []);
 
   useEffect(() => {
-    setChatMessages([]);
+    console.log("Subscribing");
     const unsub = subscribeChat(user, function (change) {
       if (change.type === "added") {
         const newDoc = change.doc.data();
-        setChatMessages((data) => [...data, newDoc]);
+        const key = change.doc.id;
+        setChatMessages((data) => [...data, { key, ...newDoc }]);
       }
 
       if (change.type === "modified") {
         const newDoc = change.doc.data();
-        // setChatMessages((data) => [...data, newDoc]);
+        const key = change.doc.id;
+        setChatMessages((messages) => {
+          const index = messages.findIndex((x) => x.key === key);
+          const new_message = { ...messages[index], created: newDoc.created };
+          messages[index] = new_message;
+          return [...messages];
+        });
       }
     });
-    return () => unsubscribeChat(unsub);
+    return () => {
+      setChatMessages([]);
+      unsubscribeChat(unsub);
+    };
   }, [user]);
 
   function onKeyDown(e) {
@@ -127,7 +163,10 @@ function AuthenticatedApp() {
           <ul>
             {chatList.map((chat) => (
               <li onClick={() => setUser(chat.user)}>
-                {chat.user}, {chat.message}
+                <User user_id={chat.user} /> {chat.message},{" "}
+                {chat.updated
+                  ? new Date(chat.updated.seconds).toISOString()
+                  : "Just Now"}
               </li>
             ))}
           </ul>
@@ -140,8 +179,11 @@ function AuthenticatedApp() {
               </div>
             )}
             {chatMessages.map((x) => (
-              <div>
-                {x.message} {x.user}
+              <div key={x.key}>
+                {x.message} <User user_id={x.user} />
+                {x.created
+                  ? new Date(x.created.seconds).toISOString()
+                  : "Just Now"}
               </div>
             ))}
           </div>
