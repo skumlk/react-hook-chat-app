@@ -4,11 +4,11 @@ import React from "react";
 import * as colors from "./styles/colors";
 import { Route, Link, Switch } from "react-router-dom";
 import { CenterContent } from "utils/main";
-import { useFirebaseAuth } from "context/firebase/auth-context";
 import { Input, Button } from "@chakra-ui/react";
+import { useAuth } from "services/auth";
 
 function Login() {
-  const { login } = useFirebaseAuth();
+  const { login } = useAuth();
 
   function onLogin(e) {
     e.preventDefault();
@@ -47,7 +47,7 @@ function Login() {
 }
 
 function Register() {
-  const { register } = useFirebaseAuth();
+  const { register } = useAuth();
 
   function onRegister(e) {
     e.preventDefault();

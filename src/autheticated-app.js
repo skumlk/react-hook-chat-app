@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Button, Textarea } from "@chakra-ui/react";
-import { useChat } from "context/firebase/chat-context";
 import UserSearch from "components/UserSearch";
 import UserProfile from "screens/UserProfile";
 import { Switch, Route } from "react-router-dom";
 import TimeAgo from "timeago-react";
-import { useFirebaseAuth } from "context/firebase/auth-context";
 import { UserThumb } from "components/UserThumb";
 import useUser from "hooks/useUser";
 import { ChatBubble } from "styles/style";
+import { useChatHook, useChatHistory, useChatApi } from "services/chat";
+import { useAuth } from "services/auth";
 
 function ChatHistoryItem({ chat, onSelect }) {
   const { user, isLoading } = useUser(chat.user);
@@ -31,31 +31,8 @@ function ChatHistoryItem({ chat, onSelect }) {
 }
 
 function ChatHistory({ setUser }) {
-  const [chatList, setChatList] = useState([]);
-  const { subscribeToChatHisory, getChatHistory } = useChat();
-
-  useEffect(() => {
-    let unsubscribe = null;
-    getChatHistory().then(() => {
-      const unsubscribe = subscribeToChatHisory(function (change) {
-        if (change.type === "added") {
-          const newDoc = change.doc.data();
-          setChatList((data) => [...data, newDoc]);
-        }
-
-        if (change.type === "modified") {
-          const newDoc = change.doc.data();
-          setChatList((chatList) => {
-            const list = chatList.filter((x) => x.user !== newDoc.user);
-            list.unshift(newDoc);
-            return list;
-          });
-        }
-      });
-    });
-
-    return () => { if (unsubscribe !== null) unsubscribe(); }
-  }, [subscribeToChatHisory, getChatHistory]);
+  const { user: authUser } = useAuth();
+  const { data: chatList } = useChatHistory(authUser?.uid)
 
   return (
     <div className="p-4">
@@ -103,35 +80,9 @@ function ChatMessage({ message, isReply }) {
 }
 
 function ChatMessages({ user: user_id }) {
-  const { subscribeChat, unsubscribeChat } = useChat();
-  const [chatMessages, setChatMessages] = useState([]);
-  const { user: authUser } = useFirebaseAuth();
+  const { user: authUser } = useAuth();
   const { user, isLoading } = useUser(user_id);
-
-  useEffect(() => {
-    const unsub = subscribeChat(user_id, function (change) {
-      if (change.type === "added") {
-        const newDoc = change.doc.data();
-        const key = change.doc.id;
-        setChatMessages((data) => [...data, { key, ...newDoc }]);
-      }
-
-      if (change.type === "modified") {
-        const newDoc = change.doc.data();
-        const key = change.doc.id;
-        setChatMessages((messages) => {
-          const index = messages.findIndex((x) => x.key === key);
-          const new_message = { ...messages[index], created: newDoc.created };
-          messages[index] = new_message;
-          return [...messages];
-        });
-      }
-    });
-    return () => {
-      setChatMessages([]);
-      unsubscribeChat(unsub);
-    };
-  }, [user_id, subscribeChat, unsubscribeChat]);
+  const { data: chatMessages } = useChatHook(authUser?.uid, user_id)
 
   if (chatMessages.length === 0)
     return (
@@ -188,13 +139,14 @@ function ChatInput({ onNewMessage, disabled }) {
 }
 
 function ChatHome() {
+  const { user: authUser } = useAuth();
   const [user, setUser] = useState();
-  const { sendMessage } = useChat();
+  const { sendChatMessage } = useChatApi()
 
   function sendNewMessage(message) {
-    sendMessage(user, message);
+    sendChatMessage(authUser.uid, user, message);
   }
-
+  
   return (
     <React.Fragment>
       <div className="flex flex-row flex-grow bg-gray-200 p-4 max-h-full">

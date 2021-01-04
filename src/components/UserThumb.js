@@ -1,6 +1,6 @@
-import { useFirebaseAuth } from "context/firebase/auth-context";
 import useUser from "hooks/useUser";
 import React from "react";
+import { useAuth } from "services/auth";
 import { RoundThumb } from "styles/style";
 
 function UserThumb({ user_id }) {
@@ -8,6 +8,7 @@ function UserThumb({ user_id }) {
 
   return (
     <RoundThumb
+      title={user?.name}
       src={
         !isLoading && user.profile_pic ? user.profile_pic : "/img/user/avatar.png"
       }
@@ -17,7 +18,7 @@ function UserThumb({ user_id }) {
 }
 
 function AuthUserThumb() {
-  const { user } = useFirebaseAuth();
+  const { user } = useAuth();
 
   return (
     <RoundThumb

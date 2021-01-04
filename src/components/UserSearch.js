@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Input, OrderedList, ListItem } from "@chakra-ui/react";
-import { useUserApi } from "context/firebase/user-context";
+import { useUserApi } from "services/user";
 
 function UserSearch({ onUserChange }) {
   const [query, setQuery] = useState("");

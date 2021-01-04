@@ -1,23 +1,6 @@
-import React, { useRef } from "react";
-const { useState, useEffect, useContext } = require("react");
-const { useFirebase } = require("./firebase-context");
-
-const FirebaseAuthContext = React.createContext();
-
-function useFirebaseAuth() {
-  const value = useContext(FirebaseAuthContext);
-  if (value === null) throw new Error("Not enclosed in FirebaseAuthProvider");
-  return value;
-}
-
-function FirebaseAuthProvider({ children }) {
-  const auth = useAuth();
-  return (
-    <FirebaseAuthContext.Provider value={auth}>
-      {children}
-    </FirebaseAuthContext.Provider>
-  );
-}
+import { useRef } from "react";
+const { useState, useEffect } = require("react");
+const { useFirebase } = require("../context/firebase/firebase-context");
 
 function useAuth() {
   const [user, setUser] = useState(null);
@@ -76,4 +59,4 @@ function useAuth() {
   return { user, register, login, logout };
 }
 
-export { FirebaseAuthProvider, useFirebaseAuth };
+export { useAuth };
