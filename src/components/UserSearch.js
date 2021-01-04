@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Input, OrderedList, ListItem } from "@chakra-ui/react";
-import { useUser } from "context/firebase/user-context";
+import { useUserApi } from "context/firebase/user-context";
 
 function UserSearch({ onUserChange }) {
   const [query, setQuery] = useState("");
   const [users, setUsers] = useState([]);
-  const { getUsersByName } = useUser();
+  const { getUsersByName } = useUserApi();
 
   function onUserClick(id) {
     setQuery("");

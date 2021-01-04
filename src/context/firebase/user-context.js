@@ -1,24 +1,24 @@
-import React, { createContext, useContext, useMemo, useState } from "react";
+import React, { createContext, useCallback, useContext, useState } from "react";
 import { getSuccessorQueryToSearch } from "utils/main";
 import { useFirebase } from "./firebase-context";
 import firebase from "firebase";
 
 const UserContext = createContext(null);
 
-function useUser() {
+function useUserApi() {
   const value = useContext(UserContext);
   if (value === null) throw new Error("Not enclosed in UserProvider");
   return value;
 }
 
 function UserProvider({ children }) {
-  const value = useUserApi();
+  const value = _useUserApi();
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 }
 
-function useUserApi() {
+function _useUserApi() {
   const { firestore: db } = useFirebase();
-  const [userCache, setUserCache] = useState({});
+  const [, setUserCache] = useState({});
   const getUsersByName = (name) => {
     var toName = getSuccessorQueryToSearch(name);
     return db
@@ -28,8 +28,8 @@ function useUserApi() {
       .get();
   };
 
-  const fetchUsersByIds = async (id_list) => {
-    if (!id_list || id_list.length == 0) return Promise.resolve();
+  const fetchUsersByIds = useCallback(() => async (id_list) => {
+    if (!id_list || id_list.length === 0) return Promise.resolve();
 
     const users = await db
       .collection("users")
@@ -41,10 +41,9 @@ function useUserApi() {
       tmpUserCache[user.id] = user.data();
     });
     setUserCache((userCache) => ({ ...userCache, ...tmpUserCache }));
-  };
+  }, [db]);
 
   const getUserById = async (id) => {
-    console.log("fetching user: ", id);
     const user = await db.collection("users").doc(id).get();
     return user.data();
   };
@@ -52,4 +51,4 @@ function useUserApi() {
   return { getUsersByName, fetchUsersByIds, getUserById };
 }
 
-export { UserProvider, useUser };
+export { UserProvider, useUserApi };

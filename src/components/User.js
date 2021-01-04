@@ -1,25 +1,17 @@
-import { useUser } from "context/firebase/user-context";
 import React from "react";
-import { isError, useQuery } from "react-query";
-import { UserThumb } from "styles/style";
+import { RoundThumb } from "styles/style";
+import useUser from "hooks/useUser";
 
-function User({ user_id }) {
-  const { getUserById } = useUser();
-  const { status, data: user, isLoading, error } = useQuery(
-    ["user", user_id],
-    () => getUserById(user_id),
-    {
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-    }
-  );
+function User({ user_id, isRight = true }) {
+  const { user, isLoading } = useUser(user_id);
+
   return (
     <React.Fragment>
       {!isLoading && (
-        <div className="flex">
-          <UserThumb
+        <div className={isRight ? "flex items-end" : "flex"}>
+          <RoundThumb
             src={user.profile_pic ? user.profile_pic : "/img/user/avatar.png"}
-            className="mr-2"
+            className="mr-2 items-end"
           />
           <div className="font-bold">{user.name}</div>
         </div>

@@ -1,18 +1,41 @@
 import React, { useEffect, useState } from "react";
 import { Button, Textarea } from "@chakra-ui/react";
 import { useChat } from "context/firebase/chat-context";
-import User from "components/User";
 import UserSearch from "components/UserSearch";
 import UserProfile from "screens/UserProfile";
 import { Switch, Route } from "react-router-dom";
 import TimeAgo from "timeago-react";
 import { useFirebaseAuth } from "context/firebase/auth-context";
+import { UserThumb } from "components/UserThumb";
+import useUser from "hooks/useUser";
+import { ChatBubble } from "styles/style";
+
+function ChatHistoryItem({ chat, onSelect }) {
+  const { user, isLoading } = useUser(chat.user);
+  return (
+    <li onClick={() => onSelect(chat.user)} className="flex">
+      <UserThumb user_id={chat.user} />
+      <div className="flex flex-col flex-grow">
+        <div className="font-bold">{!isLoading && user.name}</div>
+        <div className="text-gray-800">{chat.message}</div>
+      </div>
+      <div className="text-xs text-gray-600">
+        {chat.updated ? (
+          <TimeAgo datetime={new Date(chat.updated.seconds * 1000)} />
+        ) : (
+            "Just Now"
+          )}
+      </div>
+    </li>
+  );
+}
 
 function ChatHistory({ setUser }) {
   const [chatList, setChatList] = useState([]);
   const { subscribeToChatHisory, getChatHistory } = useChat();
 
   useEffect(() => {
+    let unsubscribe = null;
     getChatHistory().then(() => {
       const unsubscribe = subscribeToChatHisory(function (change) {
         if (change.type === "added") {
@@ -31,54 +54,62 @@ function ChatHistory({ setUser }) {
       });
     });
 
-    // return () => unsubscribe();
-  }, []);
+    return () => { if (unsubscribe !== null) unsubscribe(); }
+  }, [subscribeToChatHisory, getChatHistory]);
 
   return (
-    <React.Fragment>
-      <div className="p-4">
-        {chatList.length === 0 && <div className="mt-2">No chats</div>}
-        <ul>
-          {chatList.map((chat) => (
-            <li onClick={() => setUser(chat.user)}>
-              <User user_id={chat.user} /> {chat.message},{" "}
-              {chat.updated ? (
-                <TimeAgo datetime={new Date(chat.updated.seconds * 1000)} />
-              ) : (
-                "Just Now"
-              )}
-            </li>
-          ))}
-        </ul>
-      </div>
-    </React.Fragment>
-  );
-}
-
-function ChatMessage({ message, isReply }) {
-  console.log(isReply);
-  return (
-    <div className={isReply ? "text-right" : "text-left"}>
-      {message.message}
-      {isReply && <User user_id={message.user} />}
-      {message.created ? (
-        <TimeAgo datetime={new Date(message.created.seconds * 1000)} />
-      ) : (
-        "Just Now"
-      )}
-      {!isReply && <User user_id={message.user} />}
+    <div className="p-4">
+      {chatList.length === 0 && <div className="mt-2">No chats</div>}
+      <ul>
+        {chatList.map((chat) => (
+          <ChatHistoryItem key={chat.user} chat={chat} onSelect={setUser} />
+        ))}
+      </ul>
     </div>
   );
 }
 
-function ChatMessages({ user }) {
+function ChatMessage({ message, isReply }) {
+  return (
+    <div className="flex">
+      {isReply && <div className="flex-grow"></div>}
+      {!isReply && (
+        <div>
+          <UserThumb user_id={message.user} />
+        </div>
+      )}
+      <div>
+        <ChatBubble isReply={isReply}>
+          {message.message} {isReply ? "Yes" : "no"}
+        </ChatBubble>
+        {/* {!isLoading && user.name} */}
+        <div
+          className={
+            isReply
+              ? "text-xs text-gray-600 text-right"
+              : "text-xs text-gray-600"
+          }
+        >
+          {message.created ? (
+            <TimeAgo datetime={new Date(message.created.seconds * 1000)} />
+          ) : (
+              "Just Now"
+            )}
+        </div>
+      </div>
+      {!isReply && <div className="flex-grow"></div>}
+    </div>
+  );
+}
+
+function ChatMessages({ user: user_id }) {
   const { subscribeChat, unsubscribeChat } = useChat();
   const [chatMessages, setChatMessages] = useState([]);
   const { user: authUser } = useFirebaseAuth();
+  const { user, isLoading } = useUser(user_id);
 
   useEffect(() => {
-    console.log("Subscribing");
-    const unsub = subscribeChat(user, function (change) {
+    const unsub = subscribeChat(user_id, function (change) {
       if (change.type === "added") {
         const newDoc = change.doc.data();
         const key = change.doc.id;
@@ -100,15 +131,20 @@ function ChatMessages({ user }) {
       setChatMessages([]);
       unsubscribeChat(unsub);
     };
-  }, [user]);
+  }, [user_id, subscribeChat, unsubscribeChat]);
+
+  if (chatMessages.length === 0)
+    return (
+      <div className="text-2xl my-auto h-full ">
+        <h3>Select a chat to start a conversation</h3>
+      </div>
+    );
 
   return (
     <React.Fragment>
-      {chatMessages.length === 0 && (
-        <div className="text-2xl my-auto h-full ">
-          <h3>Select a chat to start a conversation</h3>
-        </div>
-      )}
+      <div className="p-2 mb-2 border-b-2">
+        {!isLoading && <h2 className="font-bold text-xl">{user?.name}</h2>}
+      </div>
       {chatMessages.map((message) => (
         <ChatMessage
           key={message.key}
@@ -138,13 +174,14 @@ function ChatInput({ onNewMessage, disabled }) {
   return (
     <div className="bg-white">
       <Textarea
-        placeholder="Enter message to send"
+        placeholder="Type your message..."
         value={message}
         onKeyDown={onKeyDown}
         onChange={onMessageChange}
         disabled={disabled}
         border="0px"
         borderRadius="0"
+        style={{ height: '2rem' }}
       />
     </div>
   );

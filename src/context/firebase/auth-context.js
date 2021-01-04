@@ -71,7 +71,7 @@ function useAuth() {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [auth]);
 
   return { user, register, login, logout };
 }

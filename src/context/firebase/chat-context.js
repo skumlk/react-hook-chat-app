@@ -1,8 +1,9 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useFirebaseAuth } from "./auth-context";
-import { useUser } from "./user-context";
+import { useUserApi } from "./user-context";
 import { useFirebase } from "./firebase-context";
 import firebase from "firebase";
+import { useQuery } from "react-query";
 const { createContext } = require("react");
 
 const ChatContext = createContext();
@@ -13,9 +14,11 @@ function useChat() {
   return value;
 }
 
+
+
 function ChatProvider({ children }) {
   const { user } = useFirebaseAuth();
-  const { fetchUsersByIds } = useUser();
+  const { fetchUsersByIds } = useUserApi();
   const { firestore: db, admin } = useFirebase();
   const chatapi = getChatApi(user, db, admin, fetchUsersByIds);
   return (
@@ -86,7 +89,6 @@ function getChatApi(user, db, admin, fetchUsersByIds) {
     });
 
     fetchUsersByIds([...user_list]);
-    console.log(user_list);
   };
 
   const unsubscribeChat = (unsub) => {

@@ -1,5 +1,5 @@
 // src/firebase.js
-import firebase from "firebase";
+import firebase from "firebase/app";
 const config = {
   apiKey: "AIzaSyByImdCacT3lzK-kC9zsz2E3mf9QGohlxs",
   authDomain: "react-hooks-chat-7a0e8.firebaseapp.com",

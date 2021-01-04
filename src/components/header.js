@@ -1,27 +1,64 @@
-import { Button, Flex, Spacer } from "@chakra-ui/react";
+import { ChevronDownIcon } from "@chakra-ui/icons";
+import {
+  Button,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Spacer,
+} from "@chakra-ui/react";
 import { useFirebaseAuth } from "context/firebase/auth-context";
 import React from "react";
 import { useHistory } from "react-router-dom";
+import { PRIMARY_BLUE } from "styles/colors";
+import { AuthUserThumb } from "./UserThumb";
 
 function Header() {
   const history = useHistory();
   const { user, logout } = useFirebaseAuth();
 
-  function gotoUser(){
+  function gotoUser() {
     history.push("/user");
   }
-  
-  function gotoHome(){
+
+  function gotoHome() {
     history.push("/");
   }
 
   return (
-    <Flex>
-      <h1 onClick={gotoHome}>Chat App</h1>
+    <div
+      className="flex item-center p-2 px-5"
+      style={{ backgroundColor: PRIMARY_BLUE, height: "4rem" }}
+    >
+      <h1
+        className="text-xl font-bold flex items-center"
+        onClick={gotoHome}
+      >
+        Chat App
+      </h1>
       <Spacer />
-      {user && <div onClick={gotoUser}>{user.displayName}</div>}
-      {user && <Button onClick={() => logout()}>Logout</Button>}
-    </Flex>
+      {user && (
+        <React.Fragment>
+          <AuthUserThumb onClick={gotoUser} />
+          <div className="mx-2 flex flex-col">
+            <div
+              className="font-2xl text-white	font-bold inline-block mb-1"
+              onClick={gotoUser}
+            >
+              {user.displayName}
+            </div>
+            <Menu>
+              <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
+                Available
+              </MenuButton>
+              <MenuList>
+                <MenuItem onClick={() => logout()}>Logout</MenuItem>
+              </MenuList>
+            </Menu>
+          </div>
+        </React.Fragment>
+      )}
+    </div>
   );
 }
 

@@ -54,7 +54,6 @@ function Register() {
     const { email, name, password } = e.target;
     register(name.value, email.value, password.value)
       .then((user) => {
-        console.log(user);
       })
       .catch((error) => console.log(error));
   }

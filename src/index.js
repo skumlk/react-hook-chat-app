@@ -10,12 +10,33 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { UserProvider } from "context/firebase/user-context";
 import { ChatProvider } from "context/firebase/chat-context";
 import { QueryClient, QueryClientProvider } from "react-query";
+import WebFont from 'webfontloader';
+import { extendTheme } from "@chakra-ui/react"
+
+const theme = extendTheme({
+  colors: {
+    global: {
+      body: {
+        bg: "gray.400",
+        color: "white",
+        fontFamily : "Titillium Web"
+      }
+    }
+  },
+})
+
 
 const queryClient = new QueryClient();
 
+WebFont.load({
+  google: {
+    families: ['Titillium Web:300,400,700', 'sans-serif']
+  }
+});
+
 ReactDOM.render(
   <React.StrictMode>
-    <ChakraProvider>
+    <ChakraProvider  theme={theme}>
       <FirebaseProvider>
         <FirebaseAuthProvider>
           <QueryClientProvider client={queryClient}>
