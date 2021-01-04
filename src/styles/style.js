@@ -2,7 +2,7 @@ import styled from "@emotion/styled";
 import { PRIMARY_BLUE } from "./colors";
 
 const RoundThumb = styled.img({
-  width: 50,
+  width: 36,
 });
 
 const ChatBubble = styled("div")`
@@ -14,6 +14,14 @@ const ChatBubble = styled("div")`
   text-align: center;
   position: relative;
 `;
+
+const Dot = styled("div")`
+  height: 8px;
+  width: 8px;
+  background-color: ${({isAvailable}) => isAvailable ? 'green' : '#bbb'};
+  border-radius: 50%;
+  display: inline-block;
+`
 
 // border-left: 15px solid transparent;
 // border-right: 15px solid #00bfb6;
@@ -33,4 +41,4 @@ const ChatBubble = styled("div")`
 //   top: 0px;
 // }
 
-export { RoundThumb, ChatBubble };
+export { RoundThumb, ChatBubble, Dot };

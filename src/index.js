@@ -9,6 +9,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import WebFont from 'webfontloader';
 import { extendTheme } from "@chakra-ui/react"
+import firebaseConfig from "config/firebase";
 
 const theme = extendTheme({
   colors: {
@@ -33,7 +34,7 @@ WebFont.load({
 ReactDOM.render(
   <React.StrictMode>
     <ChakraProvider theme={theme}>
-      <FirebaseProvider>
+      <FirebaseProvider configuration={firebaseConfig}>
         <QueryClientProvider client={queryClient}>
             <BrowserRouter>
               <App />

@@ -39,7 +39,7 @@ function Header() {
       <Spacer />
       {user && (
         <React.Fragment>
-          <AuthUserThumb onClick={gotoUser} />
+          <div className="flex justify-center	items-center"><AuthUserThumb onClick={gotoUser} /></div>
           <div className="mx-2 flex flex-col">
             <div
               className="font-2xl text-white	font-bold inline-block mb-1"

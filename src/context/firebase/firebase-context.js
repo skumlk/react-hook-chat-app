@@ -1,4 +1,3 @@
-import firebaseConfig from "config/firebase";
 import firebase from "firebase";
 import React, { createContext, useContext } from "react";
 const FirebaseContext = createContext(null);
@@ -9,9 +8,9 @@ function useFirebase() {
   return firebase;
 }
 
-function FirebaseProvider({ children }) {
+function FirebaseProvider({ configuration, children }) {
   //check if already initialized
-  if (firebase.apps.length === 0) firebase.initializeApp(firebaseConfig);
+  if (firebase.apps.length === 0) firebase.initializeApp(configuration);
   let firebaseApp = {
     app: firebase.app,
     database: firebase.database,

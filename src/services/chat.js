@@ -103,9 +103,9 @@ async function _sendChatMessage(db, user1_id, user2_id, message) {//user_1 send 
     batch.set(
         db.collection("chats").doc(chat_collection_name).collection("messages").doc(),
         {
+            created: firebase.firestore.FieldValue.serverTimestamp(),
             message,
             user: user1_id,
-            created: firebase.firestore.FieldValue.serverTimestamp(),
         }
     );
 
