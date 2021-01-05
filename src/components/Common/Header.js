@@ -30,12 +30,13 @@ function Header() {
       className="flex item-center p-2 px-5"
       style={{ backgroundColor: PRIMARY_BLUE, height: "4rem" }}
     >
-      <h1
-        className="text-xl font-bold flex items-center"
+      <img src="/img/common/logo.png" />
+      <div
+        className="text-2xl font-bold flex items-center"
         onClick={gotoHome}
       >
         Chat App
-      </h1>
+      </div>
       <Spacer />
       {user && (
         <React.Fragment>

@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { PRIMARY_BLUE, PRIMARY_GRAY } from "./colors";
+import { ERROR_RED_1, ERROR_RED_2, ERROR_RED_3, PRIMARY_BLUE, PRIMARY_GRAY } from "./colors";
 
 const RoundThumb = styled.img({
   width: 36,
@@ -33,6 +33,17 @@ const AutoCompleteItemList = styled("ul")`
   border: 1px solid ${PRIMARY_GRAY}
 `
 
+const ErrorMessage = styled.div(
+  `
+   color:  ${ERROR_RED_1};
+   background-color:  ${ERROR_RED_3};
+   border-color:  ${ERROR_RED_2};
+   padding: .75rem 1.25rem;
+   border: 1px solid transparent;
+   border-radius: .25rem;
+  `
+)
+
 // border-left: 15px solid transparent;
 // border-right: 15px solid #00bfb6;
 // left: -16px;
@@ -51,4 +62,4 @@ const AutoCompleteItemList = styled("ul")`
 //   top: 0px;
 // }
 
-export { RoundThumb, ChatBubble, Dot, ChatItemli, AutoCompleteItem, AutoCompleteItemList };
+export { RoundThumb, ChatBubble, Dot, ChatItemli, AutoCompleteItem, AutoCompleteItemList, ErrorMessage };

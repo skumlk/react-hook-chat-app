@@ -1,3 +1,6 @@
 export const green = "#258545"
-export const PRIMARY_BLUE = "#0098D6"
+export const PRIMARY_BLUE = "#5B8EFB"
 export const PRIMARY_GRAY = "#AFAFAF"
+export const ERROR_RED_1 = "#721c24"
+export const ERROR_RED_2 = "#f5c6cb" 
+export const ERROR_RED_3 = "#f8d7da"

@@ -15,4 +15,9 @@ function getSuccessorQueryToSearch(query) {
   return result;
 }
 
-export { CenterContent, getSuccessorQueryToSearch };
+function validateEmail(email) {
+  var re = /\S+@\S+\.\S+/;
+  return re.test(email);
+}
+
+export { CenterContent, getSuccessorQueryToSearch, validateEmail };

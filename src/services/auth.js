@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { useFirebase } from "context/firebase/firebase-context";
+import { useMutation } from "react-query";
 const { useState, useEffect } = require("react");
 
 function useAuth() {
@@ -7,16 +8,16 @@ function useAuth() {
   const { auth, firestore: db } = useFirebase();
   const isPendingUserRegister = useRef(false);
 
-  const login = (email, password) => {
+  const login = useMutation(({ email, password }) => {
     return auth()
       .signInWithEmailAndPassword(email, password)
       .then((response) => {
         setUser(response.user);
         return response.user;
       });
-  };
+  });
 
-  const register = (name, email, password) => {
+  const register = useMutation(({name, email, password}) => {
     let user = null;
     isPendingUserRegister.current = true;
     return auth()
@@ -38,7 +39,7 @@ function useAuth() {
       .finally(() => {
         isPendingUserRegister.current = false;
       });
-  };
+  });
 
   const logout = () => {
     return auth()
