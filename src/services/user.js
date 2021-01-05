@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { getSuccessorQueryToSearch } from "utils/main";
-import { useFirebase } from "../context/firebase/firebase-context";
+import { useFirebase } from "context/firebase/firebase-context";
 import firebase from "firebase";
 
 

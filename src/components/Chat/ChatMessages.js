@@ -1,4 +1,4 @@
-import { UserThumb } from "components/UserThumb";
+import { UserThumb } from "components/User/UserThumb";
 import useUser from "hooks/useUser";
 import React, { useEffect, useRef } from "react"
 import { useAuth } from "services/auth";
@@ -45,8 +45,6 @@ function ChatMessages({ user: user_id }) {
     const { data: chatMessages } = useChatHook(authUser?.uid, user_id)
     const chatMessagesEndRef = useRef()
 
-    console.log(chatMessages)
-
     useEffect(() => {
         if (chatMessagesEndRef.current)
             chatMessagesEndRef.current.scrollIntoView({ behavior: "smooth" })
@@ -55,7 +53,7 @@ function ChatMessages({ user: user_id }) {
     if (chatMessages.length === 0)
         return (
             <div className="text-2xl my-auto h-full ">
-                <h3>Select a chat to start a conversation</h3>
+                <h4>Select a chat to start a conversation</h4>
             </div>
         );
 

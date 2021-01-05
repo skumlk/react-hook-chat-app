@@ -1,7 +1,7 @@
 import React from "react";
 import AuthenticatedApp from "./autheticated-app";
 import UnauthenticatedApp from "./unautheticated-app";
-import Header from "components/header";
+import Header from "components/Common/Header";
 import { useAuth } from "services/auth";
 
 function App() {

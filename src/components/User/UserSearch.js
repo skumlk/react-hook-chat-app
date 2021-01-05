@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Input, OrderedList, ListItem } from "@chakra-ui/react";
+import { Input, OrderedList, ListItem, List } from "@chakra-ui/react";
 import { useUserApi } from "services/user";
+import { useAuth } from "services/auth";
+import { AutoCompleteItem, AutoCompleteItemList } from "styles/style";
 
 function UserSearch({ onUserChange }) {
+  const { user: AuthUser } = useAuth()
+  const [isFocused, setFocused] = useState(false)
   const [query, setQuery] = useState("");
   const [users, setUsers] = useState([]);
   const { getUsersByName } = useUserApi();
@@ -17,32 +21,36 @@ function UserSearch({ onUserChange }) {
       setUsers([]);
       return;
     }
-    getUsersByName(query).then((result) => {
+    getUsersByName(query.toLowerCase()).then((result) => {
       const users = [];
       if (!result.empty)
-        result.forEach((doc) => users.push({ id: doc.id, ...doc.data() }));
+        result.forEach((doc) => { if (doc.id !== AuthUser.uid) users.push({ id: doc.id, ...doc.data() }) });
+        console.log(users)
       setUsers(users);
     });
   }, [query, getUsersByName]);
 
+  const isShowMenu = isFocused &&  query
   return (
     <div>
       <Input
         placeholder="Search By Name"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
+        onBlur={() => setFocused(false)}
+        onFocus={() => setFocused(true)}
       />
-      <OrderedList>
+      { isShowMenu && <AutoCompleteItemList>
         {users.length === 0 && query && (
-          <ListItem>No users for {query}</ListItem>
+          <AutoCompleteItem>No users for {query}</AutoCompleteItem>
         )}
         {users &&
           users.map((item) => (
-            <ListItem key={item.id} onClick={() => onUserClick(item.id)}>
+            <AutoCompleteItem key={item.id} onClick={() => onUserClick(item.id)}>
               {item.name}
-            </ListItem>
+            </AutoCompleteItem>
           ))}
-      </OrderedList>
+      </AutoCompleteItemList>}
     </div>
   );
 }

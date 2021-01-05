@@ -1,6 +1,6 @@
 import { useRef } from "react";
+import { useFirebase } from "context/firebase/firebase-context";
 const { useState, useEffect } = require("react");
-const { useFirebase } = require("../context/firebase/firebase-context");
 
 function useAuth() {
   const [user, setUser] = useState(null);

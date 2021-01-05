@@ -2,11 +2,18 @@ import firebase from "firebase";
 import { useEffect, useState } from "react";
 import { useFirebase } from "context/firebase/firebase-context";
 
+const _sortByUpdated = (a, b) => (b.updated?.seconds ?? Infinity) - (a.updated?.seconds ?? Infinity)
+
 function _handleSnapshotchanges(setData, change) {
+
     if (change.type === "added") {
         const new_doc = change.doc.data();
         const key = change.doc.id;
-        setData((data) => [...data, { key, ...new_doc }]);
+        setData((data) => {
+            const result = [...data, { key, ...new_doc }]
+            result.sort(_sortByUpdated)
+            return result
+        });
     }
 
     if (change.type === "modified") {
@@ -14,8 +21,9 @@ function _handleSnapshotchanges(setData, change) {
         const key = change.doc.id;
         setData((data) => {
             const index = data.findIndex((x) => x.key === key);
-            const result = [...data]
+            let result = [...data]
             result[index] = { key, ...new_doc }
+            result.sort(_sortByUpdated)
             return result;
         });
     }
@@ -29,26 +37,36 @@ function _getChatCollectionName(user1_id, user2_id) {
 function useChatHook(user1_id, user2_id) {
     const { firestore: db } = useFirebase();
     const [data, setData] = useState([])
+    const [isLoading, setLoading] = useState(false)
 
     useEffect(() => {
         if (!(user1_id && user2_id))
             return
 
-        const collection_name = _getChatCollectionName(user1_id, user2_id)
-        const unsubscribe = db.collection("chats")
-            .doc(collection_name)
-            .collection("messages")
-            .orderBy("created")
-            .onSnapshot((query_snapshot) => {
-                query_snapshot.docChanges().forEach(function (change) {
-                    _handleSnapshotchanges(setData, change)
-                });
-            });
+        setLoading(true)
+        let unsubscribe = undefined;
+        async function subscribeChatAndCreateIfNotExist() {
+            const collection_name = _getChatCollectionName(user1_id, user2_id)
 
+            unsubscribe = db.collection("chats")
+                .doc(collection_name)
+                .collection("messages")
+                .orderBy("created")
+                .onSnapshot((query_snapshot) => {
+                    if (query_snapshot.size === 0)
+                        _sendChatMessage(db, user1_id, user2_id, "Welcome")
+
+                    query_snapshot.docChanges().forEach(function (change) {
+                        _handleSnapshotchanges(setData, change)
+                    });
+                });
+        }
+
+        subscribeChatAndCreateIfNotExist()
         return () => { setData([]); unsubscribe(); }
     }, [db, user1_id, user2_id])
 
-    return { data }
+    return { isLoading, data }
 }
 
 function useChatHistory(user_id) {

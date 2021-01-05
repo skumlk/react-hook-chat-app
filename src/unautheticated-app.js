@@ -52,7 +52,7 @@ function Register() {
   function onRegister(e) {
     e.preventDefault();
     const { email, name, password } = e.target;
-    register(name.value, email.value, password.value)
+    register(name.value.toLowerCase(), email.value, password.value)
       .then((user) => {
       })
       .catch((error) => console.log(error));

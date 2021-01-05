@@ -1,15 +1,16 @@
 import React from "react"
 import useUser from "hooks/useUser";
 import TimeAgo from "timeago-react";
-import { UserThumb } from "components/UserThumb";
+import { UserThumb } from "components/User/UserThumb";
 import { useAuth } from "services/auth";
 import { useChatHistory } from "services/chat";
-import { Dot } from "../../styles/style"
+import { ChatItemli, Dot } from "styles/style"
 
-function ChatHistoryItem({ chat, onSelect }) {
+function ChatHistoryItem({ chat, onSelect, isSelected }) {
     const { user, isLoading } = useUser(chat.user);
+    console.log(isSelected)
     return (
-        <li onClick={() => onSelect(chat.user)} className="flex my-2">
+        <ChatItemli onClick={() => onSelect(chat.user)} className="flex my-2 p-2" isSelected={isSelected} >
             <div className="flex justify-center	items-center"><UserThumb user_id={chat.user} /></div>
             <div className="flex flex-col flex-grow">
                 <div className="font-bold">{!isLoading && user.name}</div>
@@ -27,11 +28,11 @@ function ChatHistoryItem({ chat, onSelect }) {
                         )}
                 </div>
             </div>
-        </li>
+        </ChatItemli>
     );
 }
 
-function ChatHistory({ setUser }) {
+function ChatHistory({user: selectedUser, setUser }) {
     const { user: authUser } = useAuth();
     const { data: chatList } = useChatHistory(authUser?.uid)
 
@@ -40,7 +41,7 @@ function ChatHistory({ setUser }) {
             {chatList.length === 0 && <div className="mt-2">No chats</div>}
             <ul>
                 {chatList.map((chat) => (
-                    <ChatHistoryItem key={chat.user} chat={chat} onSelect={setUser} />
+                    <ChatHistoryItem key={chat.user} chat={chat} onSelect={setUser} isSelected={selectedUser === chat.user}/>
                 ))}
             </ul>
         </div>

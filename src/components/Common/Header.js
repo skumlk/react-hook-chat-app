@@ -11,7 +11,7 @@ import React from "react";
 import { useHistory } from "react-router-dom";
 import { useAuth } from "services/auth";
 import { PRIMARY_BLUE } from "styles/colors";
-import { AuthUserThumb } from "./UserThumb";
+import { AuthUserThumb } from "components/User/UserThumb";
 
 function Header() {
   const history = useHistory();

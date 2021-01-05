@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { PRIMARY_BLUE } from "./colors";
+import { PRIMARY_BLUE, PRIMARY_GRAY } from "./colors";
 
 const RoundThumb = styled.img({
   width: 36,
@@ -22,6 +22,16 @@ const Dot = styled("div")`
   border-radius: 50%;
   display: inline-block;
 `
+const ChatItemli = styled("li")`
+  background-color: ${({isSelected}) => isSelected ? PRIMARY_GRAY : 'white'};
+`
+
+const AutoCompleteItem = styled.li(
+  `padding: 0.5rem;`
+)
+const AutoCompleteItemList = styled("ul")`
+  border: 1px solid ${PRIMARY_GRAY}
+`
 
 // border-left: 15px solid transparent;
 // border-right: 15px solid #00bfb6;
@@ -41,4 +51,4 @@ const Dot = styled("div")`
 //   top: 0px;
 // }
 
-export { RoundThumb, ChatBubble, Dot };
+export { RoundThumb, ChatBubble, Dot, ChatItemli, AutoCompleteItem, AutoCompleteItemList };
