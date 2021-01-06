@@ -1,29 +1,29 @@
 import styled from "@emotion/styled";
 import { ERROR_RED_1, ERROR_RED_2, ERROR_RED_3, PRIMARY_BLUE, PRIMARY_GRAY } from "./colors";
 
-const RoundThumb = styled.img({
-  width: 36,
-});
+const RoundThumb = styled("img")
+  `min-width: ${({ size }) => size === "small" ? "42px" : "128px"};
+   width: ${({ size }) => size === "small" ? "42px" : "128px"};`;
 
 const ChatBubble = styled("div")`
   margin: 5px auto;
   border-radius: 15px;
   background: ${({ isReply }) => (isReply ? PRIMARY_BLUE : "#fff")};
   color: ${({ isReply }) => (isReply ? "#fff" : "#000")};
+  text-align: ${({ isReply }) => (isReply ? "right" : "left")};
   padding: 10px;
-  text-align: center;
   position: relative;
 `;
 
 const Dot = styled("div")`
   height: 8px;
   width: 8px;
-  background-color: ${({isAvailable}) => isAvailable ? 'green' : '#bbb'};
+  background-color: ${({ isAvailable }) => isAvailable ? 'green' : '#bbb'};
   border-radius: 50%;
   display: inline-block;
 `
 const ChatItemli = styled("li")`
-  background-color: ${({isSelected}) => isSelected ? PRIMARY_GRAY : 'white'};
+  background-color: ${({ isSelected }) => isSelected ? PRIMARY_GRAY : 'white'};
 `
 
 const AutoCompleteItem = styled.li(

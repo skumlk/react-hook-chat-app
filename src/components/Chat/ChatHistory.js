@@ -11,16 +11,16 @@ function ChatHistoryItem({ chat, onSelect, isSelected }) {
     console.log(isSelected)
     return (
         <ChatItemli onClick={() => onSelect(chat.user)} className="flex my-2 p-2" isSelected={isSelected} >
-            <div className="flex justify-center	items-center"><UserThumb user_id={chat.user} /></div>
-            <div className="flex flex-col flex-grow">
-                <div className="font-bold">{!isLoading && user.name}</div>
-                <div className="text-gray-800">{chat.message}</div>
+            <div className="flex justify-center	items-center mr-2"><UserThumb user_id={chat.user} /></div>
+            <div className="flex flex-col flex-grow overflow-hidden">
+                <div className="font-bold capitalize text-sm flex-grow">{!isLoading && user.name}</div>
+                <div className="text-gray-600 overflow-ellipsis overflow-hidden whitespace-nowrap text-xs">{chat.message}</div>
             </div>
-            <div className="flex flex-col">
+            <div className="flex flex-col pl-2">
                 <div className="flex-grow text-right">
                     <Dot></Dot>
                 </div>
-                <div className="text-xs text-gray-600">
+                <div className="text-xs text-gray-600 whitespace-nowrap">
                     {chat.updated ? (
                         <TimeAgo datetime={new Date(chat.updated.seconds * 1000)} />
                     ) : (

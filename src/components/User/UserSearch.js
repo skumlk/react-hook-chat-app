@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Input, OrderedList, ListItem, List } from "@chakra-ui/react";
+import { Input } from "@chakra-ui/react";
 import { useUserApi } from "services/user";
 import { useAuth } from "services/auth";
 import { AutoCompleteItem, AutoCompleteItemList } from "styles/style";
@@ -46,7 +46,7 @@ function UserSearch({ onUserChange }) {
         )}
         {users &&
           users.map((item) => (
-            <AutoCompleteItem key={item.id} onClick={() => onUserClick(item.id)}>
+            <AutoCompleteItem key={item.id} onClick={() => onUserClick(item.id)} className="capitalize">
               {item.name}
             </AutoCompleteItem>
           ))}

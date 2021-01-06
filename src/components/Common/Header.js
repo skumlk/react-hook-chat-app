@@ -8,7 +8,7 @@ import {
   Spacer,
 } from "@chakra-ui/react";
 import React from "react";
-import { useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { useAuth } from "services/auth";
 import { PRIMARY_BLUE } from "styles/colors";
 import { AuthUserThumb } from "components/User/UserThumb";
@@ -16,10 +16,6 @@ import { AuthUserThumb } from "components/User/UserThumb";
 function Header() {
   const history = useHistory();
   const { user, logout } = useAuth();
-
-  function gotoUser() {
-    history.push("/user");
-  }
 
   function gotoHome() {
     history.push("/");
@@ -32,7 +28,7 @@ function Header() {
     >
       <img src="/img/common/logo.png" />
       <div
-        className="text-2xl font-bold flex items-center"
+        className="text-xl font-bold flex items-center cursor-pointer"
         onClick={gotoHome}
       >
         Chat App
@@ -40,16 +36,20 @@ function Header() {
       <Spacer />
       {user && (
         <React.Fragment>
-          <div className="flex justify-center	items-center"><AuthUserThumb onClick={gotoUser} /></div>
+          <div className="flex justify-center	items-center">
+            <Link to="/user" className="cursor-pointer">
+              <AuthUserThumb />
+            </Link>
+          </div>
           <div className="mx-2 flex flex-col">
-            <div
-              className="font-2xl text-white	font-bold inline-block mb-1"
-              onClick={gotoUser}
+            <Link
+              className="text-base text-white inline-block mb-1 cursor-pointer capitalize"
+              to="/user" 
             >
               {user.displayName}
-            </div>
+            </Link>
             <Menu>
-              <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
+              <MenuButton as={Button} rightIcon={<ChevronDownIcon />} size="xs">
                 Available
               </MenuButton>
               <MenuList>

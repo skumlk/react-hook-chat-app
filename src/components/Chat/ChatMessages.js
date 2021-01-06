@@ -16,7 +16,7 @@ function ChatMessage({ message, isReply }) {
                 </div>
             )}
             <div>
-                <ChatBubble isReply={isReply}>
+                <ChatBubble isReply={isReply} className="whitespace-pre-line">
                     {message.message}
                 </ChatBubble>
                 {/* {!isLoading && user.name} */}

@@ -6,10 +6,12 @@ function ChatInput({ onNewMessage, disabled }) {
     const [message, setMessage] = useState("");
 
     function onKeyDown(e) {
-        if (e.key === "Enter") {
+        if(e.key === "Enter" && e.ctrlKey)
+            setMessage(message => message + "\n")
+        else if (e.key === "Enter" && !e.ctrlKey && message && message.trim().length > 0) {
             e.preventDefault();
+            onNewMessage(message.trim());
             setMessage("");
-            onNewMessage(message);
         }
     }
 

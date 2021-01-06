@@ -1,16 +1,14 @@
 /** @jsx jsx */
 import { jsx } from "@emotion/react";
 import React, { useState } from "react";
-import * as colors from "./styles/colors";
 import { Route, Link, Switch } from "react-router-dom";
 import { CenterContent } from "utils/main";
-import { Input, Button, Badge, FormErrorIcon } from "@chakra-ui/react";
+import { Input, Button } from "@chakra-ui/react";
 import { useAuth } from "services/auth";
 import { PRIMARY_BLUE } from "styles/colors";
 import { validateEmail } from "utils/main"
 import * as _ from "lodash";
 import { ErrorMessage } from "styles/style";
-import { Spinner } from "@chakra-ui/react"
 
 function ShowError({ error }) {
   return error ? <ErrorMessage colorScheme="red">{error}</ErrorMessage> : null
@@ -48,7 +46,7 @@ function Login() {
   return (
     <div style={{ backgroundColor: PRIMARY_BLUE }}>
       <CenterContent>
-        <div className="text-2xl text-white text-center mb-10">Welcome Back!</div>
+        <div className="text-2xl text-white text-center mb-10 max-h-full min-h-0 flex-grow">Welcome Back!</div>
         <form
           className="rounded-2xl p-14 mb-4"
           css={{
@@ -63,9 +61,9 @@ function Login() {
           <Input id="password" type="password" placeholder="Password" className="mt-4 p-6" onChange={textChange} />
           <ShowError error={error.password} />
           <Button type="submit" className="mt-4 p-6 text-white	font-normal	 text-lg"
-            disabled={login.isLoading}
+            isLoading={login.isLoading}
             isFullWidth={true} style={{ backgroundColor: PRIMARY_BLUE }}>
-            {login.isLoading ? <Spinner /> : 'Login'}
+            Login
           </Button>
         </form>
         <div className="flex">
@@ -129,10 +127,10 @@ function Register() {
           <ShowError error={error.email} />
           <Input id="password" type="password" placeholder="Password" className="mt-4 p-6" onChange={textChange} />
           <ShowError error={error.password} />
-          <Button type="submit" className="mt-4 p-6 text-white font-normal	text-lg" 
+          <Button type="submit" className="mt-4 p-6 text-white font-normal	text-lg"
             isFullWidth={true} style={{ backgroundColor: PRIMARY_BLUE }}
-            disabled={register.isLoading}>
-            {register.isLoading ? <Spinner /> : 'Register'}
+            isLoading={register.isLoading}>
+            Register
           </Button>
         </form>
         <div className="flex">
