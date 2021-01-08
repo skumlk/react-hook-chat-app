@@ -1,4 +1,5 @@
 import React from "react";
+import { ErrorMessage } from "styles/style";
 
 function CenterContent({ children }) {
   return (
@@ -20,4 +21,8 @@ function validateEmail(email) {
   return re.test(email);
 }
 
-export { CenterContent, getSuccessorQueryToSearch, validateEmail };
+function ShowError({ error }) {
+  return error ? <ErrorMessage colorScheme="red">{error}</ErrorMessage> : null
+}
+
+export { CenterContent, getSuccessorQueryToSearch, validateEmail, ShowError };

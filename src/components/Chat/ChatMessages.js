@@ -8,7 +8,7 @@ import TimeAgo from "timeago-react";
 
 function ChatMessage({ message, isReply }) {
     return (
-        <div className="flex">
+        <div className="flex p-1">
             {isReply && <div className="flex-grow"></div>}
             {!isReply && (
                 <div>
@@ -52,7 +52,7 @@ function ChatMessages({ user: user_id }) {
 
     if (chatMessages.length === 0)
         return (
-            <div className="text-2xl my-auto h-full ">
+            <div className="text-2xl my-auto h-full flex items-center justify-center">
                 <h4>Select a chat to start a conversation</h4>
             </div>
         );
@@ -60,7 +60,7 @@ function ChatMessages({ user: user_id }) {
     return (
         <React.Fragment>
             <div className="p-2 mb-2 border-b-2">
-                {!isLoading && <h2 className="font-bold text-xl">{user?.name}</h2>}
+                {!isLoading && <h2 className="font-bold text-xl capitalize">{user?.name}</h2>}
             </div>
             <div className="flex-grow overflow-y-scroll p-5">
                 {chatMessages.map((message) => (

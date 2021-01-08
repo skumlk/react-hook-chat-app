@@ -16,23 +16,18 @@ import { AuthUserThumb } from "components/User/UserThumb";
 function Header() {
   const history = useHistory();
   const { user, logout } = useAuth();
-
-  function gotoHome() {
-    history.push("/");
-  }
-
+  
   return (
     <div
       className="flex item-center p-2 px-5"
       style={{ backgroundColor: PRIMARY_BLUE, height: "4rem" }}
     >
-      <img src="/img/common/logo.png" />
-      <div
-        className="text-xl font-bold flex items-center cursor-pointer"
-        onClick={gotoHome}
-      >
-        Chat App
-      </div>
+      <Link to="/">
+        <img src="/img/common/logo.png" />
+        <div className="text-xl font-bold flex items-center cursor-pointer">
+          Chat App
+        </div>
+      </Link>
       <Spacer />
       {user && (
         <React.Fragment>
@@ -44,7 +39,7 @@ function Header() {
           <div className="mx-2 flex flex-col">
             <Link
               className="text-base text-white inline-block mb-1 cursor-pointer capitalize"
-              to="/user" 
+              to="/user"
             >
               {user.displayName}
             </Link>

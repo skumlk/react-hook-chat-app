@@ -8,7 +8,6 @@ import { ChatItemli, Dot } from "styles/style"
 
 function ChatHistoryItem({ chat, onSelect, isSelected }) {
     const { user, isLoading } = useUser(chat.user);
-    console.log(isSelected)
     return (
         <ChatItemli onClick={() => onSelect(chat.user)} className="flex my-2 p-2" isSelected={isSelected} >
             <div className="flex justify-center	items-center mr-2"><UserThumb user_id={chat.user} /></div>
@@ -37,7 +36,7 @@ function ChatHistory({user: selectedUser, setUser }) {
     const { data: chatList } = useChatHistory(authUser?.uid)
 
     return (
-        <div className="p-4">
+        <div className="p-2">
             {chatList.length === 0 && <div className="mt-2">No chats</div>}
             <ul>
                 {chatList.map((chat) => (

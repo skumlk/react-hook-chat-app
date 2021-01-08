@@ -2,17 +2,12 @@
 import { jsx } from "@emotion/react";
 import React, { useState } from "react";
 import { Route, Link, Switch } from "react-router-dom";
-import { CenterContent } from "utils/main";
+import { CenterContent, ShowError } from "utils/main";
 import { Input, Button } from "@chakra-ui/react";
 import { useAuth } from "services/auth";
 import { PRIMARY_BLUE } from "styles/colors";
 import { validateEmail } from "utils/main"
 import * as _ from "lodash";
-import { ErrorMessage } from "styles/style";
-
-function ShowError({ error }) {
-  return error ? <ErrorMessage colorScheme="red">{error}</ErrorMessage> : null
-}
 
 function Login() {
   const { login } = useAuth();

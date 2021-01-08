@@ -13,6 +13,7 @@ const ChatBubble = styled("div")`
   text-align: ${({ isReply }) => (isReply ? "right" : "left")};
   padding: 10px;
   position: relative;
+  font-size: 0.888rem;
 `;
 
 const Dot = styled("div")`

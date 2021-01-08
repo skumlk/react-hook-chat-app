@@ -17,7 +17,6 @@ const theme = extendTheme({
       body: {
         bg: "gray.400",
         color: "white",
-        fontFamily: "Titillium Web"
       }
     }
   },
@@ -27,7 +26,7 @@ const queryClient = new QueryClient();
 
 WebFont.load({
   google: {
-    families: ['Titillium Web:300,400,700', 'sans-serif']
+    families: ['Open Sans:300,400,700', 'sans-serif']
   }
 });
 

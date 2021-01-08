@@ -17,7 +17,7 @@ function useAuth() {
       });
   });
 
-  const register = useMutation(({name, email, password}) => {
+  const register = useMutation(({ name, email, password }) => {
     let user = null;
     isPendingUserRegister.current = true;
     return auth()
@@ -47,6 +47,10 @@ function useAuth() {
       .then(() => setUser(null));
   };
 
+  const updateProfile = useMutation((({ name, email }) => {
+    return user.updateProfile({ displayName: name, email })
+  }))
+
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged((user) => {
       if (isPendingUserRegister.current === true) return;
@@ -57,7 +61,7 @@ function useAuth() {
     return () => unsubscribe();
   }, [auth]);
 
-  return { user, register, login, logout };
+  return { user, register, login, logout, updateProfile };
 }
 
 export { useAuth };
